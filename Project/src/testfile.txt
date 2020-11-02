@@ -1,0 +1,16 @@
+/*This
+ is a 
+test comment
+
+*/ 
+while (True){
+	val x0 : int = 3432;
+	var val_y : int = 1 + 1 / 2;/*Another comment*/
+	var Pi : float = 3.14;
+
+	if (x0<0 || (x0<=0 && x0==0)){
+		print("Hello");
+	}else if(x0==1){
+		x0 = x0-1;
+	}
+}
