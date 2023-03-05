@@ -1,0 +1,71 @@
+
+var puzzle : [[int]] = [
+    [0,8,6,0,0,0,0,0,0],
+    [0,2,0,6,8,0,0,5,0],
+    [1,0,9,0,0,0,0,0,0],
+    [0,4,3,0,0,0,0,0,9],
+    [0,5,0,4,7,0,0,2,0],
+    [0,0,0,0,0,8,0,4,0],
+    [0,0,0,3,0,5,8,1,7],
+    [0,0,0,0,2,0,0,0,4],
+    [4,0,7,0,9,0,2,6,5]
+    ]
+
+
+def solve(grid : [[int]], row : int, col : int, num : int) : bool {
+    for x = 0 to 9{
+        var boxRow : int = 3 * int(row/3)
+        var boxCol : int = 3 * int(col/3)
+        var subBoxRow : int = boxRow + int(x/3)
+        var subBoxCol : int = boxCol + (x%3)
+        if ((grid[row][x] == num) || (grid[x][col] == num) || ((subBoxRow!=row) && (subBoxCol!=col) && (grid[subBoxRow][subBoxCol]== num)) ){
+            return False
+        }
+    }
+    return True
+}
+def sudoku(grid : [[int]], row : int, col : int) : bool {
+    if ((row == 8) && (col == 9)){
+        return True
+    }
+    if (col == 9){
+        row = row + 1
+        col = 0
+    }
+    if (grid[row][col] > 0){
+        return sudoku(grid,row,col+1)
+    }
+    for num = 1 to 10 {
+
+        if solve(grid,row,col,num){
+
+            grid[row][col] = num
+
+            if sudoku(grid,row,col + 1){
+                return True
+            }
+
+        }
+        grid[row][col] = 0
+    }
+    return False
+}
+
+def alter() : none {
+    puzzle[0][0] = 2
+}
+
+def solveSudoku(grid : [[int]]) : none{
+    val isSolved : bool = sudoku(grid,0,0)
+
+    if isSolved{
+        for i = 0 to len(grid){
+            print(puzzle[i])
+        }
+    }else{
+        print("Solution not found.")
+    }
+}
+
+solveSudoku(puzzle)
+

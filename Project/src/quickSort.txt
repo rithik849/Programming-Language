@@ -1,0 +1,48 @@
+
+/* 
+
+Reference 
+title : Quicksort,
+howpublished : https://www.geeksforgeeks.org/quick-sort/,
+author : GeeksForGeeks,
+note : "Accessed : 20-3-2021"
+
+*/
+var to_sort : [int] = [9,8,7,6,5,4,3,2,1]
+
+def partition(sort : [int], low : int , high : int) : int {
+    var i : int = low - 1
+    var pivot : int = sort[high]
+
+    for j = low to high {
+        if sort[j] <= pivot {
+            i = i + 1
+            var tmp : int = sort[i]
+            sort[i] = sort[j]
+            sort[j] = tmp
+        }
+    }
+    var tmp : int = sort[i+1]
+    sort[i+1] = sort[high]
+    sort[high] = tmp
+
+    return i + 1
+}
+
+def quickSort(sort : [int], low : int, high : int) : [int] { 
+    if len(sort) == 1 {
+        return sort
+    }
+
+    if low < high {
+        var pi : int = partition(sort,low,high)
+        quickSort(sort,low,pi - 1)
+        quickSort(sort,pi+1,high)
+    }
+    return []
+}
+
+quickSort(to_sort,0,len(to_sort)-1)
+
+print(to_sort)
+

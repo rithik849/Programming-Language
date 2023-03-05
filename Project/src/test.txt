@@ -1,0 +1,48 @@
+
+var a : int = 33
+
+val b : float = 3.14
+
+// single line comment
+
+/*
+multi 
+line 
+comment
+*/
+
+//Lexical Error
+//;
+
+//Syntax Error
+//print)
+
+//Semantic Error
+//b - True
+
+//Runtime Error
+//3+2*6/(6-6)
+
+def sum(c : int, d : float) : float{
+    val e : float = c + d
+    //while True{return e}
+    return e
+}
+
+val f : float = sum(a,b)
+
+val list : [int] = [44,55,44,33,22]
+
+var empty_list : [int] = []
+
+print(empty_list + list)
+
+print("Hello "+ "World!")
+
+
+def s() : none {
+    print("Hello World")
+}
+
+s()
+print(int(f))
