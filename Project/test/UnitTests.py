@@ -16,33 +16,33 @@ class SymbolTableTest(unittest.TestCase):
         self.grandChildTable = SymbolTable(self.childTableTest)
 
     def test_initialisation(self):
-        self.assertEquals(self.childTableTest.getParent(),self.symbolTable)
+        self.assertEqual(self.childTableTest.getParent(),self.symbolTable)
 
     def test_root(self):
-         self.assertEquals(self.grandChildTable.getRoot(),self.symbolTable)
+         self.assertEqual(self.grandChildTable.getRoot(),self.symbolTable)
 
     def test_functionEntry(self):
         functionEntry = ("a","int","FUNC")
         self.grandChildTable.setFunctionEntry(functionEntry)
-        self.assertEquals(self.grandChildTable.getFunctionEntry(),functionEntry)
+        self.assertEqual(self.grandChildTable.getFunctionEntry(),functionEntry)
 
     def test_insert_lookup(self):
         #Test entry
         self.childTableTest.insert("test","str","VAR")
-        self.assertEquals(self.childTableTest.lookup("test"),("test","str","VAR",None,[]))
-        self.assertEquals(self.grandChildTable.lookup("test"),("test","str","VAR",None,[]))
+        self.assertEqual(self.childTableTest.lookup("test"),("test","str","VAR",None,[]))
+        self.assertEqual(self.grandChildTable.lookup("test"),("test","str","VAR",None,[]))
         
         #Test overwrite entry
         self.childTableTest.insert("test","int","VAL")
-        self.assertEquals(self.childTableTest.lookup("test"),("test","int","VAL",None,[]))
-        self.assertEquals(len(self.childTableTest.symbols),1)
+        self.assertEqual(self.childTableTest.lookup("test"),("test","int","VAL",None,[]))
+        self.assertEqual(len(self.childTableTest.symbols),1)
         
         #Test new entry
         self.childTableTest.insert("test_var","int","VAL")
-        self.assertEquals(len(self.childTableTest.symbols),2)
+        self.assertEqual(len(self.childTableTest.symbols),2)
 
         self.grandChildTable.insert("test","int","VAL")
-        self.assertEquals(len(self.grandChildTable.symbols),1)
+        self.assertEqual(len(self.grandChildTable.symbols),1)
 
     def tearDown(self):
         self.symboTable =None
@@ -57,23 +57,23 @@ class NodeTest(unittest.TestCase):
     def test_type(self):
         test = Type("Hello World!","str")
         
-        self.assertEquals(test.val,"Hello World!")
-        self.assertEquals(test.type,"str")
-        self.assertEquals(test.typecheck(self.test_tbl),"str")
-        self.assertEquals(test.python_print(),"Hello World!")
-        self.assertEquals(test.python_print(1),"\tHello World!")
+        self.assertEqual(test.val,"Hello World!")
+        self.assertEqual(test.type,"str")
+        self.assertEqual(test.typecheck(self.test_tbl),"str")
+        self.assertEqual(test.python_print(),"Hello World!")
+        self.assertEqual(test.python_print(1),"\tHello World!")
 
     def test_id(self):
         self.test_tbl.insert("a","int","VAL")
 
         test = ID("a")
 
-        self.assertEquals(test.typecheck(self.test_tbl),"int")
-        self.assertEquals(test.generateSymbolTable(self.test_tbl),self.test_tbl)
+        self.assertEqual(test.typecheck(self.test_tbl),"int")
+        self.assertEqual(test.generateSymbolTable(self.test_tbl),self.test_tbl)
 
         test_error = ID("b")
-        self.assertEquals(test_error.typecheck(self.test_tbl),None)
-        self.assertEquals(test_error.generateSymbolTable(self.test_tbl),self.test_tbl)
+        self.assertEqual(test_error.typecheck(self.test_tbl),None)
+        self.assertEqual(test_error.generateSymbolTable(self.test_tbl),self.test_tbl)
         self.assertIn("Undefined identifier b",getErrors())
 
     def test_var(self):
@@ -89,29 +89,29 @@ class NodeTest(unittest.TestCase):
     def test_list(self):
 
         test = List([Type("","str"),Type("string","str")])
-        self.assertEquals(test.generateSymbolTable(self.test_tbl),self.test_tbl)
-        self.assertEquals(test.typecheck(self.test_tbl),"[str]")
+        self.assertEqual(test.generateSymbolTable(self.test_tbl),self.test_tbl)
+        self.assertEqual(test.typecheck(self.test_tbl),"[str]")
 
         test_empty = List([])
-        self.assertEquals(test_empty.typecheck(self.test_tbl),"[]")
+        self.assertEqual(test_empty.typecheck(self.test_tbl),"[]")
 
         test_error = List([Type("","int"),Type("string","str")])
-        self.assertEquals(test_error.typecheck(self.test_tbl),None)
+        self.assertEqual(test_error.typecheck(self.test_tbl),None)
         self.assertIn("All list elements must be of the same type.",getErrors())
-        self.assertEquals(len(getErrors()),1)
+        self.assertEqual(len(getErrors()),1)
 
-        self.assertEquals(test.hasTerminalReturn(),False)
-        self.assertEquals(test.hasNoReturn(),True)
+        self.assertEqual(test.hasTerminalReturn(),False)
+        self.assertEqual(test.hasNoReturn(),True)
 
-        self.assertEquals(test_empty.python_print(),"[]")
-        self.assertEquals(test.python_print(),"[,string]")
+        self.assertEqual(test_empty.python_print(),"[]")
+        self.assertEqual(test.python_print(),"[,string]")
 
     def test_index(self):
         test_list = List([Type("","str"),Type("string","str")])
         
         test =Index(test_list,Type(4,"int"))
 
-        self.assertEquals(test.generateSymbolTable(self.test_tbl),self.test_tbl)
+        self.assertEqual(test.generateSymbolTable(self.test_tbl),self.test_tbl)
         
         #Test the wrong parameter type being passed as an index
         test_2d_list_error = Index(test,Type('3',"str"))
@@ -119,7 +119,7 @@ class NodeTest(unittest.TestCase):
 
         self.assertIn("Index must be of type int",getErrors())
         #Test that getIdenType returns the List class when indexing a list.
-        self.assertEquals(test.getIdenType(self.test_tbl),List)
+        self.assertEqual(test.getIdenType(self.test_tbl),List)
 
         clearErrors()
         
@@ -127,14 +127,14 @@ class NodeTest(unittest.TestCase):
         test_2d_list = Index(test,Type('3',"int"))
         test_2d_list.generateSymbolTable(self.test_tbl)
 
-        self.assertEquals(getErrors(),set())
-        self.assertEquals(test_2d_list.getIdenType(self.test_tbl),List)
+        self.assertEqual(getErrors(),set())
+        self.assertEqual(test_2d_list.getIdenType(self.test_tbl),List)
 
 
         #Test indexing throws an error with non-list types.
         test_typecheck = Index(Type("erroneous","str"),Type(2,"int"))
 
-        self.assertEquals(test_typecheck.typecheck(self.test_tbl),None)
+        self.assertEqual(test_typecheck.typecheck(self.test_tbl),None)
         self.assertIn("Indexing applies only to list type structures.",getErrors())
 
     def test_init_assign(self):
@@ -238,78 +238,78 @@ class NodeTest(unittest.TestCase):
         #Assign a value to an index.
         test = Assign(Index(ID("listOfNumbers"),Type(0,"int")),Type(2.0,"float"))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(getErrors(),set())
+        self.assertEqual(getErrors(),set())
 
     def test_binary_op(self):
 
         #Test with integer and float typed correctly
         test = Bin_Op("+",Type(3,"int"),Type(2.0,"float"))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals("float",test.typecheck(self.test_tbl))
-        self.assertEquals(0,len(getErrors()))
+        self.assertEqual("float",test.typecheck(self.test_tbl))
+        self.assertEqual(0,len(getErrors()))
 
         #Test with bool and float gives an error
         test = Bin_Op("+",Type(3,"bool"),Type(2.0,"float"))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(None,test.typecheck(self.test_tbl))
+        self.assertEqual(None,test.typecheck(self.test_tbl))
         self.assertIn("Binary Operator + not callable between parameters of type bool and float",getErrors())
         
         #Test that list concatonation works in correct use
         test = Bin_Op("+",List([Type(3,"float")]),List([Type(2.0,"float")]))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals("[float]",test.typecheck(self.test_tbl))
+        self.assertEqual("[float]",test.typecheck(self.test_tbl))
 
         #Test that list concatonation detects incorrect use
         test = Bin_Op("+",List([Type(3,"float")]),List([Type("2.0","str")]))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(None,test.typecheck(self.test_tbl))
+        self.assertEqual(None,test.typecheck(self.test_tbl))
         self.assertIn("Binary Operator + not callable between parameters of type [float] and [str]",getErrors())
 
         #Test string concatonation works
         test = Bin_Op("+",Type("Hello ","str"),Type("World","str"))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals("str",test.typecheck(self.test_tbl))
+        self.assertEqual("str",test.typecheck(self.test_tbl))
 
         clearErrors()
 
         #Test multiple binary operations used incorrectly give the correct error messages.
         test = Bin_Op("+",Bin_Op("+",Type("This","str"),Type(3,"int")),Bin_Op("+",Type(2,"int"),Type("is","str")))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(None,test.typecheck(self.test_tbl))
-        self.assertEquals(2,len(getErrors()))
+        self.assertEqual(None,test.typecheck(self.test_tbl))
+        self.assertEqual(2,len(getErrors()))
 
         clearErrors()
 
         #Test division typechecks to a float
         test = Bin_Op("/",Type(3,"int"),Type(2,"int"))
-        self.assertEquals(test.typecheck(self.test_tbl),"float")
+        self.assertEqual(test.typecheck(self.test_tbl),"float")
 
         test = Bin_Op("/",Type(3,"int"),Type(2.0,"float"))
-        self.assertEquals(test.typecheck(self.test_tbl),"float")
+        self.assertEqual(test.typecheck(self.test_tbl),"float")
 
         #Test Modulo
         test = Bin_Op("%",Bin_Op("-",Type(3,"int"),Type(5,"float")),Type(5,"int"))
-        self.assertEquals(test.typecheck(self.test_tbl),"float")
+        self.assertEqual(test.typecheck(self.test_tbl),"float")
 
         #Test comparison operators
         for operator in ["<",">","<=",">=","!=","=="]:
             test = Bin_Op(operator,Type(4,"int"),Type(6,"float"))
-            self.assertEquals(test.typecheck(self.test_tbl),"bool")
+            self.assertEqual(test.typecheck(self.test_tbl),"bool")
 
         test = Bin_Op("==",Bin_Op("<",Type(4,"int"),Type(6.0,"float")),Bin_Op(">=",Type(4,"int"),Type(6,"int")) )
-        self.assertEquals(test.typecheck(self.test_tbl),"bool")
+        self.assertEqual(test.typecheck(self.test_tbl),"bool")
 
         test = Bin_Op("!=",Type("test","str"),Type(0,"int"))
-        self.assertEquals(test.typecheck(self.test_tbl),"bool")
+        self.assertEqual(test.typecheck(self.test_tbl),"bool")
 
         #Test boolean operators
         for operator in ["||","&&"]:
             test = Bin_Op(operator,Type(True,"bool"),Type(False,"bool"))
-            self.assertEquals(test.typecheck(self.test_tbl),"bool")
+            self.assertEqual(test.typecheck(self.test_tbl),"bool")
 
         test = Bin_Op("||",Type(True,"int"),Type(False,"bool"))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(len(getErrors()),1)
+        self.assertEqual(len(getErrors()),1)
 
 
     def test_unary_op(self):
@@ -317,45 +317,45 @@ class NodeTest(unittest.TestCase):
         #Test unary operators with incorrect type
         test = Unary_Op("-",Type(True,"bool"))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(test.typecheck(self.test_tbl),None)
+        self.assertEqual(test.typecheck(self.test_tbl),None)
         self.assertIn("Unary Operator - not callable with parameter bool",getErrors())
 
         test = Unary_Op("!",Type(3,"int"))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(test.typecheck(self.test_tbl),None)
+        self.assertEqual(test.typecheck(self.test_tbl),None)
         self.assertIn("Unary Operator ! not callable with parameter int",getErrors())
 
         clearErrors()
         #Test unary operators being used correctly.
         test = Unary_Op("!",Type(True,"bool"))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(test.typecheck(self.test_tbl),"bool")
-        self.assertEquals(len(getErrors()),0)
+        self.assertEqual(test.typecheck(self.test_tbl),"bool")
+        self.assertEqual(len(getErrors()),0)
 
         test = Unary_Op("-",Type(3,"int"))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(test.typecheck(self.test_tbl),"int")
-        self.assertEquals(len(getErrors()),0)
+        self.assertEqual(test.typecheck(self.test_tbl),"int")
+        self.assertEqual(len(getErrors()),0)
 
         #Test uanry operator used along with binary operator
         test = Unary_Op("!", Bin_Op("&&",Type("True","bool"), Bin_Op("<", Type(3,"int") , Type(6,"int") ) ) )
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(test.typecheck(self.test_tbl),"bool")
-        self.assertEquals(len(getErrors()),0)
+        self.assertEqual(test.typecheck(self.test_tbl),"bool")
+        self.assertEqual(len(getErrors()),0)
 
     def test_print(self):
         test = Print(Type("test","str"))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(len(getErrors()),0)
+        self.assertEqual(len(getErrors()),0)
 
         test = Print( Bin_Op("+", List( [Type(4,"int"),Type(5,"int")] ) , List( [] ) ) )
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(len(getErrors()),0)
+        self.assertEqual(len(getErrors()),0)
 
         #Test errors are caught within print statement
         test = Print( Bin_Op("+", List( [Type(4,"float"),Type(5,"int")] ) , List( [] ) ) )
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(len(getErrors()),1)
+        self.assertEqual(len(getErrors()),1)
 
     def test_while(self):
         #Check condition is typechecked
@@ -369,7 +369,7 @@ class NodeTest(unittest.TestCase):
         test_body = Return(Type(2,"int"))
         test = While(Type(False,"bool"),test_body)
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(test.hasNoReturn(),False)
+        self.assertEqual(test.hasNoReturn(),False)
         self.assertIn("Return statement must be within a function",getErrors())
         clearErrors()
 
@@ -377,15 +377,15 @@ class NodeTest(unittest.TestCase):
         test_body = Statements(InitAssign(Var(ID("v"),"bool"),Type(False,"bool")), ID("v"))
         test = While(Type(False,"bool"),test_body)
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(len(self.test_tbl.symbols),0)
-        self.assertEquals(len(getErrors()),0)
+        self.assertEqual(len(self.test_tbl.symbols),0)
+        self.assertEqual(len(getErrors()),0)
 
     def test_for(self):
         #Test body errors are detected
         test_body = Return(Type(2,"int"))
         test = For(ID("a"),Type(0,"int"),Type(6,"int"),test_body)
         test.generateSymbolTable(self.test_tbl)  
-        self.assertEquals(test.hasNoReturn(),False)      
+        self.assertEqual(test.hasNoReturn(),False)      
         self.assertIn("Return statement must be within a function",getErrors())
         clearErrors()
 
@@ -409,24 +409,24 @@ class NodeTest(unittest.TestCase):
         #Test if statement works without else block
         test = If(ID("a"),Unary_Op("!",Type(False,"bool")))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(len(getErrors()),0)
+        self.assertEqual(len(getErrors()),0)
 
         #Test with else statement
         test = If(ID("a"),Unary_Op("!",Type(False,"bool")),ID("s"))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(len(getErrors()),0)
+        self.assertEqual(len(getErrors()),0)
 
     def test_function(self):
         #Test function with no abnormal fields
         test = Function(ID("test"),[Var(ID("num"),"int")],"int",Return(ID("num")))
         test.generateSymbolTable(self.test_tbl)
-        self.assertEquals(len(getErrors()),0)
+        self.assertEqual(len(getErrors()),0)
 
         #Test function with 2 parameters of the same name, gives an error.
         test = Function(ID("test"),[Var(ID("num"),"int"),Var(ID("num"),"int")],"int",Return(ID("num")))
         test.generateSymbolTable(self.test_tbl)
         self.assertIn("Function Declaration of test: Repeated parameters in function definition of test",getErrors())
-        self.assertEquals(len(getErrors()),1)
+        self.assertEqual(len(getErrors()),1)
         clearErrors()
 
         #Test function defined within another function
@@ -440,7 +440,7 @@ class NodeTest(unittest.TestCase):
         test = Function(ID("test"),[Var(ID("num"),"int")],"int",While(Type(False,"bool"),Return(ID("num")) ))
         test.generateSymbolTable(self.test_tbl)
         self.assertIn("Function Declaration of test: Function test does not have a terminal return statement",getErrors())
-        self.assertEquals(test.hasNoReturn(),False)
+        self.assertEqual(test.hasNoReturn(),False)
         clearErrors()
 
         #Test a function of type none, can check for return statements in the body
@@ -456,69 +456,69 @@ class NodeTest(unittest.TestCase):
 
         #Function call of non-existant function
         test = Call(ID("f"),[])
-        self.assertEquals(test.typecheck(self.test_tbl),None)
+        self.assertEqual(test.typecheck(self.test_tbl),None)
         self.assertIn("Function f not found",getErrors())
 
         #Function call of a variable
         test = Call(ID("a"),[])
-        self.assertEquals(test.typecheck(self.test_tbl),None)
+        self.assertEqual(test.typecheck(self.test_tbl),None)
         self.assertIn("Function Call of a: a is not a function",getErrors())
 
         #Test incorrect number of parameters is handled correctly.
         test = Call(ID("test"),[Type("param1","str")])
-        self.assertEquals(test.typecheck(self.test_tbl),None)
+        self.assertEqual(test.typecheck(self.test_tbl),None)
         self.assertIn("Function Call of test: 2 parameters expected but 1 given",getErrors())
         clearErrors()
 
         #Test type mismatch is handled correctly
         test = Call(ID("test"),[Type("param1","str"),List([ID("a")])])
-        self.assertEquals(test.typecheck(self.test_tbl),None)
+        self.assertEqual(test.typecheck(self.test_tbl),None)
         self.assertIn("Function Call of test: Type mismatch for parameter num of type int with argument of type str",getErrors())
 
         test = Call(ID("test"),[Unary_Op("-",Type("h","str")),List([ID("a")])])
-        self.assertEquals(test.typecheck(self.test_tbl),None)
+        self.assertEqual(test.typecheck(self.test_tbl),None)
         self.assertIn("Function Call of test: Argument does not match type int of parameter num",getErrors())
         clearErrors()
 
         #Test Casting
         test = Call(ID("len"),[])
-        self.assertEquals(test.typecheck(self.test_tbl),None)
+        self.assertEqual(test.typecheck(self.test_tbl),None)
         self.assertIn("Function Call of len: 1 parameter expected but found 0",getErrors())
         clearErrors()
 
         test = Call(ID("len"),[Type("argument","int")])
-        self.assertEquals(test.typecheck(self.test_tbl),None)
+        self.assertEqual(test.typecheck(self.test_tbl),None)
         self.assertIn("Function Call of len: len can only be used with parameters of type list",getErrors())
         clearErrors()
 
         test = Call(ID("len"),[List([])])
-        self.assertEquals(test.typecheck(self.test_tbl),"int")
+        self.assertEqual(test.typecheck(self.test_tbl),"int")
 
         for cast in ["str","bool"]:
             test = Call(ID(cast),[])
-            self.assertEquals(test.typecheck(self.test_tbl),None)
+            self.assertEqual(test.typecheck(self.test_tbl),None)
             self.assertIn("Function Call of "+cast+": 1 parameter expected but found 0",getErrors())
             clearErrors()
 
             test = Call(ID(cast),[Type(3,"int")])
-            self.assertEquals(test.typecheck(self.test_tbl),cast)
+            self.assertEqual(test.typecheck(self.test_tbl),cast)
 
         for cast in ["int","float"]:
             test = Call(ID(cast),[])
-            self.assertEquals(test.typecheck(self.test_tbl),None)
+            self.assertEqual(test.typecheck(self.test_tbl),None)
             self.assertIn("Function Call of "+cast+": 1 parameter expected but found 0",getErrors())
             clearErrors()
 
             test = Call(ID(cast),[Type(True,"bool")])
-            self.assertEquals(test.typecheck(self.test_tbl),None)
+            self.assertEqual(test.typecheck(self.test_tbl),None)
             self.assertIn("Function Call of "+cast+": "+cast+" can only be used with parameters of type int and float",getErrors())
             clearErrors()
 
             test = Call(ID(cast),[Type(3,"int")])
-            self.assertEquals(test.typecheck(self.test_tbl),cast)
+            self.assertEqual(test.typecheck(self.test_tbl),cast)
 
             test = Call(ID(cast),[Type(3.4,"float")])
-            self.assertEquals(test.typecheck(self.test_tbl),cast)
+            self.assertEqual(test.typecheck(self.test_tbl),cast)
 
     def test_return(self):
         #Returning different type from function type
@@ -545,18 +545,18 @@ class NodeTest(unittest.TestCase):
         test_component_2 = Type(4,"int")
         test = Statements(test_component_1,test_component_2)
 
-        self.assertEquals(test.statements,test_component_1)
-        self.assertEquals(test.statement,test_component_2)
-        self.assertEquals(test.hasTerminalReturn(),False)
-        self.assertEquals(test.hasNoReturn(),True)
+        self.assertEqual(test.statements,test_component_1)
+        self.assertEqual(test.statement,test_component_2)
+        self.assertEqual(test.hasTerminalReturn(),False)
+        self.assertEqual(test.hasNoReturn(),True)
 
         #Test if return statement can be detected
         test_component_1 = Type(4,"int")
         test_component_2 = Return(Type("Hello","str"))
         test = Statements(test_component_1,test_component_2)
 
-        self.assertEquals(test.hasTerminalReturn(),True)
-        self.assertEquals(test.hasNoReturn(),False)
+        self.assertEqual(test.hasTerminalReturn(),True)
+        self.assertEqual(test.hasNoReturn(),False)
 
     def tearDown(self):
         clearErrors()
@@ -573,98 +573,98 @@ class LexerTest(unittest.TestCase):
         test = """tmp"""
         tokens = tokenize_test(test)
 
-        self.assertEquals(tokens[0].type,"IDEN")
-        self.assertEquals(tokens[0].lineno,1)
-        self.assertEquals(tokens[0].value,"tmp")
+        self.assertEqual(tokens[0].type,"IDEN")
+        self.assertEqual(tokens[0].lineno,1)
+        self.assertEqual(tokens[0].value,"tmp")
 
     def test_keyword(self):
 
         for key in keyword.keys():
             test = key
             tokens = tokenize_test(test)
-            self.assertEquals(tokens[0].type,keyword[key])
-            self.assertEquals(tokens[0].lineno,1)
+            self.assertEqual(tokens[0].type,keyword[key])
+            self.assertEqual(tokens[0].lineno,1)
 
     def test_dataType(self):
         for key in dataType.keys():
             test = key
             tokens = tokenize_test(test)
-            self.assertEquals(tokens[0].type,dataType[key])
-            self.assertEquals(tokens[0].lineno,1)
+            self.assertEqual(tokens[0].type,dataType[key])
+            self.assertEqual(tokens[0].lineno,1)
 
     def test_comma(self):
         test = ""","""
         tokens = tokenize_test(test)
-        self.assertEquals(tokens[0].type,"COMMA")
+        self.assertEqual(tokens[0].type,"COMMA")
 
     def test_colon(self):
         test = """ : """
         tokens = tokenize_test(test)
-        self.assertEquals(tokens[0].type,"COL")
+        self.assertEqual(tokens[0].type,"COL")
 
     def test_parentheses(self):
         test = """{ ( [  
         ] ) } """
         tokens = tokenize_test(test)
-        self.assertEquals(tokens[0].value,"{")
-        self.assertEquals(tokens[1].value,"(")
-        self.assertEquals(tokens[2].value,"[")
-        self.assertEquals(tokens[3].value,"]")
-        self.assertEquals(tokens[4].value,")")
-        self.assertEquals(tokens[5].value,"}")
-        self.assertEquals(tokens[0].type,"L_SCOPE")
-        self.assertEquals(tokens[1].type,"L_PAR")
-        self.assertEquals(tokens[2].type,"L_BRACE")
-        self.assertEquals(tokens[3].type,"R_BRACE")
-        self.assertEquals(tokens[4].type,"R_PAR")
-        self.assertEquals(tokens[5].type,"R_SCOPE")
-        self.assertEquals(tokens[5].lineno,2)
+        self.assertEqual(tokens[0].value,"{")
+        self.assertEqual(tokens[1].value,"(")
+        self.assertEqual(tokens[2].value,"[")
+        self.assertEqual(tokens[3].value,"]")
+        self.assertEqual(tokens[4].value,")")
+        self.assertEqual(tokens[5].value,"}")
+        self.assertEqual(tokens[0].type,"L_SCOPE")
+        self.assertEqual(tokens[1].type,"L_PAR")
+        self.assertEqual(tokens[2].type,"L_BRACE")
+        self.assertEqual(tokens[3].type,"R_BRACE")
+        self.assertEqual(tokens[4].type,"R_PAR")
+        self.assertEqual(tokens[5].type,"R_SCOPE")
+        self.assertEqual(tokens[5].lineno,2)
 
     def test_type(self):
         test = """254 34.5 True "string1" 'string2' """
 
         tokens = tokenize_test(test)
 
-        self.assertEquals(tokens[0].type,"INT")
-        self.assertEquals(tokens[1].type,"FLOAT")
-        self.assertEquals(tokens[2].type,"BOOL")
-        self.assertEquals(tokens[3].type,"STRING")
-        self.assertEquals(tokens[4].type,"STRING")
+        self.assertEqual(tokens[0].type,"INT")
+        self.assertEqual(tokens[1].type,"FLOAT")
+        self.assertEqual(tokens[2].type,"BOOL")
+        self.assertEqual(tokens[3].type,"STRING")
+        self.assertEqual(tokens[4].type,"STRING")
 
     def test_assignment(self):
         test = """="""
 
         tokens = tokenize_test(test)
 
-        self.assertEquals(tokens[0].type,"ASSIGNMENT")
+        self.assertEqual(tokens[0].type,"ASSIGNMENT")
 
     def test_operators(self):
         test = """ <><=>===!=+-*/^%&&||!"""
 
         tokens = tokenize_test(test)
 
-        self.assertEquals(tokens[0].type,"LESS")
-        self.assertEquals(tokens[1].type,"GREATER")
-        self.assertEquals(tokens[2].type,"LESS_EQUAL")
-        self.assertEquals(tokens[3].type,"GREATER_EQUAL")
-        self.assertEquals(tokens[4].type,"EQUAL")
-        self.assertEquals(tokens[5].type,"NOT_EQUAL")
-        self.assertEquals(tokens[6].type,"ADD")
-        self.assertEquals(tokens[7].type,"SUB")
-        self.assertEquals(tokens[8].type,"MUL")
-        self.assertEquals(tokens[9].type,"DIV")
-        self.assertEquals(tokens[10].type,"POW")
-        self.assertEquals(tokens[11].type,"MOD")
-        self.assertEquals(tokens[12].type,"AND")
-        self.assertEquals(tokens[13].type,"OR")
-        self.assertEquals(tokens[14].type,"NOT")
+        self.assertEqual(tokens[0].type,"LESS")
+        self.assertEqual(tokens[1].type,"GREATER")
+        self.assertEqual(tokens[2].type,"LESS_EQUAL")
+        self.assertEqual(tokens[3].type,"GREATER_EQUAL")
+        self.assertEqual(tokens[4].type,"EQUAL")
+        self.assertEqual(tokens[5].type,"NOT_EQUAL")
+        self.assertEqual(tokens[6].type,"ADD")
+        self.assertEqual(tokens[7].type,"SUB")
+        self.assertEqual(tokens[8].type,"MUL")
+        self.assertEqual(tokens[9].type,"DIV")
+        self.assertEqual(tokens[10].type,"POW")
+        self.assertEqual(tokens[11].type,"MOD")
+        self.assertEqual(tokens[12].type,"AND")
+        self.assertEqual(tokens[13].type,"OR")
+        self.assertEqual(tokens[14].type,"NOT")
 
     def test_comment(self):
         test = """/* This is a comment  */ """
         tokens = tokenize_test(test)
 
-        self.assertEquals(tokens,[])
-        self.assertEquals(getErrors(),set())
+        self.assertEqual(tokens,[])
+        self.assertEqual(getErrors(),set())
 
     def tearDown(self):
         SemanticAnalyzer.clearErrors()
@@ -680,10 +680,10 @@ class ParserTest(unittest.TestCase):
     def test_mathematical_expression(self):
         test = """ 1+2/4*5"""
         nodes = comp_test(test)
-        self.assertEquals(len(getErrors()),0)
-        self.assertEquals(nodes.op,"+")
-        self.assertEquals(nodes.rhs.op,"*")
-        self.assertEquals(nodes.rhs.lhs.op,"/")
+        self.assertEqual(len(getErrors()),0)
+        self.assertEqual(nodes.op,"+")
+        self.assertEqual(nodes.rhs.op,"*")
+        self.assertEqual(nodes.rhs.lhs.op,"/")
 
     def test_lexical_error(self):
         test = """2.3443.454a
@@ -729,7 +729,7 @@ class ParserTest(unittest.TestCase):
         }
         """
         comp_test(test)
-        self.assertEquals(len(getErrors()),0)
+        self.assertEqual(len(getErrors()),0)
 
     def test_runtime_exception(self):
         test = """
